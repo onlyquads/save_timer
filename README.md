@@ -4,7 +4,7 @@ A maya script that creates a shelf button that changes over time
 to remind user to save file.
 
 ## INSTALLATION:
-- copy the save_folder script to your maya/script directory.
+- copy the save_timer folder to your maya/script directory.
 - add these lines to userSetup.py:
 
 ```
