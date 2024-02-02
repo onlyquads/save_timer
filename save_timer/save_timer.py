@@ -1,8 +1,7 @@
 '''
 # DESCRIPTION:
-This script will add a save reminder button shelf on the current active
-maya shelf. This timer will give a hint about the last 'file save' action
-and remind you to save if the last save is a couple of minutes ago.
+A maya script that creates a shelf button that changes over time
+to remind user to save file.
 
 # TODO: -Add ShelfTab changed behavior: remove existing button + create button
 
@@ -104,7 +103,7 @@ class SaveTimer(QWidget):
 
     def create_button(self):
         # print('Button Created')
-        command = 'print("Timer button clicked")'
+        command = ''
         shelf_top_level = mm.eval('$temp = $gShelfTopLevel')
         current_shelf = mc.tabLayout(
             shelf_top_level, query=True, selectTab=True)
