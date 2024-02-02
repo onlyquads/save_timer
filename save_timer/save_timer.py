@@ -28,7 +28,7 @@ TIMER_INTERVAL = 90000  # In milliseconds (1min30)
 TIMER_BUTTON_WIDTH = 120
 
 TIMER_STATES = [
-    (0.0, 'FILE NOT SAVED', (1.0, 0.0, 0.0)),
+    (-1.0, 'FILE NOT SAVED', (1.0, 0.0, 0.0)),
     (1.0, 'JUST NOW', (0.0, 1.0, 0.0)),
     (120.0, 'RECENTLY', (0.0, 0.5, 0.0)),
     (300.0, 'A FEW MIN AGO', (1.0, 0.451, 0.0)),
