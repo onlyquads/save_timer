@@ -75,8 +75,6 @@ class SaveTimer(QWidget):
 
     def on_scene_new(self, *args):
         # print('New scene')
-        self.remove_from_shelf()
-        self.create_button()
         if self.timer.isActive():
             self.timer.stop()
         self.update_button(DEFAUT_STATE[0], DEFAUT_STATE[1])
