@@ -3,8 +3,6 @@
 A maya script that creates a shelf button that changes over time
 to remind user to save file.
 
-# TODO: -Add ShelfTab changed behavior: remove existing button + create button
-
 # INSTALLATION:
 add these lines to userSetup.py:
 
@@ -15,6 +13,8 @@ mc.evalDeferred(
 
 # COMPATIBILITY:
 Maya 2022 and above
+
+# TODO: -Add ShelfTab changed behavior: remove existing button + create button
 '''
 
 import maya.cmds as mc
