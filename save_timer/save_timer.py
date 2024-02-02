@@ -26,9 +26,9 @@ from PySide2.QtCore import QTimer, QElapsedTimer
 TOOLNAME = 'Save Timer'
 TIMER_INTERVAL = 90000  # In milliseconds (1min30)
 TIMER_BUTTON_WIDTH = 120
-DEFAUT_STATE = ['File not saved', (1.0, 0.0, 0.0)]
 
 TIMER_STATES = [
+    (0.0, 'FILE NOT SAVED', (1.0, 0.0, 0.0)),
     (1.0, 'JUST NOW', (0.0, 1.0, 0.0)),
     (120.0, 'RECENTLY', (0.0, 0.5, 0.0)),
     (300.0, 'A FEW MIN AGO', (1.0, 0.451, 0.0)),
@@ -38,7 +38,6 @@ TIMER_STATES = [
 
 class SaveTimer(QWidget):
     def __init__(self):
-        self.button_name = DEFAUT_STATE[0]
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.check_timer)
@@ -67,7 +66,7 @@ class SaveTimer(QWidget):
         self.check_timer()
 
     def on_scene_open(self, *args):
-        print('scene opened')
+        # print('scene opened')
         if not self.timer.isActive():
             self.timer.start(TIMER_INTERVAL)
         self.elapsed_timer.start()
@@ -77,7 +76,7 @@ class SaveTimer(QWidget):
         # print('New scene')
         if self.timer.isActive():
             self.timer.stop()
-        self.update_button(DEFAUT_STATE[0], DEFAUT_STATE[1])
+        self.update_button(TIMER_STATES[0][1], TIMER_STATES[0][2])
 
     def check_timer(self):
         # print('check timer')
@@ -107,7 +106,7 @@ class SaveTimer(QWidget):
             shelf_top_level, query=True, selectTab=True)
         mc.setParent(current_shelf)
         self.shelf_timer_button = mc.shelfButton(
-            label=self.button_name,
+            label=TIMER_STATES[0][1],
             useTemplate=TIMER_STATES[0][1],
             annotation='save timer click to save',
             style='textOnly',
@@ -134,13 +133,10 @@ class SaveTimer(QWidget):
         currentShelf = mc.tabLayout(top_shelf, q=True, st=True)
         buttons = mc.shelfLayout(currentShelf, q=True, ca=True)
         # Combine all the possible save timer button names in a list
-        timer_names = [self.button_name]
-        for i in TIMER_STATES:
-            timer_names.append(i[1])
 
         for button in buttons:
             button_name = mc.shelfButton(button, q=True, label=True)
-            if any(button_name == name for name in timer_names):
+            if any(button_name == name[1] for name in TIMER_STATES):
                 # last check if the shelf button exists before deleting it
                 if mc.shelfButton(button, exists=True):
                     mc.deleteUI(button)
