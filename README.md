@@ -1,10 +1,11 @@
 # Save Timer
-# DESCRIPTION:
+## DESCRIPTION:
 A maya script that creates a shelf button that changes over time
 to remind user to save file.
 
-# INSTALLATION:
-add these lines to userSetup.py:
+## INSTALLATION:
+- copy the save_folder script to your maya/script directory.
+- add these lines to userSetup.py:
 
 ```
 import maya.cmds as mc
@@ -13,5 +14,5 @@ mc.evalDeferred(
     lowestPriority=True)
 ```
 
-# COMPATIBILITY:
+## COMPATIBILITY:
 Maya 2022 and above
