@@ -4,13 +4,19 @@ A maya script that creates a shelf button that changes over time
 to remind user to save file.
 
 # INSTALLATION:
-add these lines to userSetup.py:
+Copy/Paste the save_timer folder to your maya20XX/scripts folder.
+Use the following lines in maya python console or shelf button:
 
-import maya.cmds as mc
-mc.evalDeferred(
+```from save_timer.save_timer import SaveTimer; SaveTimer()```
+
+To launch it on maya startup do the following:
+In the maya20XX/scripts folder, open or create the 'userSetup.py' file
+add these lines to it:
+```
+maya.cmds.evalDeferred(
     "from save_timer.save_timer import SaveTimer; SaveTimer()",
     lowestPriority=True)
-
+```
 # COMPATIBILITY:
 Maya 2022 and above
 
@@ -29,11 +35,12 @@ TIMER_BUTTON_WIDTH = 120
 TIMER_STATES = [
     (-1.0, 'FILE NOT SAVED', (1.0, 0.0, 0.0)),
     (1.0, 'JUST NOW', (0.0, 1.0, 0.0)),
-    (120.0, 'RECENTLY', (0.0, 0.5, 0.0)),
-    (300.0, 'A FEW MIN AGO', (1.0, 0.451, 0.0)),
-    (480.0, 'SAVE NOW!', (1.0, 0.0, 0.0))
+    (200.0, 'RECENTLY', (0.0, 0.5, 0.0)),
+    (500.0, 'A FEW MIN AGO', (1.0, 0.451, 0.0)),
+    (600.0, 'SAVE NOW!', (1.0, 0.0, 0.0))
     ]
 
+# Insert the command you want to be execute when save timer button is clicked
 # SAVE_CMD = 'import maya.cmds as mc; mc.file(type="mayaAscii", save=True)'
 SAVE_CMD = ''
 
