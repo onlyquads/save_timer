@@ -40,7 +40,7 @@ TIMER_STATES = [
     (600.0, 'SAVE NOW!', (1.0, 0.0, 0.0))
     ]
 
-# Insert the command you want to be execute when save timer button is clicked
+# Insert the command you want to execute when save timer button is clicked
 # SAVE_CMD = 'import maya.cmds as mc; mc.file(type="mayaAscii", save=True)'
 SAVE_CMD = ''
 
