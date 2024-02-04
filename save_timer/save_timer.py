@@ -224,5 +224,4 @@ def launch_save_timer():
     if not save_timer:
         save_timer = SaveTimer()
         return
-    if save_timer:
-        save_timer.kill_save_timer()
+    save_timer.kill_save_timer()
