@@ -7,7 +7,7 @@ to remind user to save file.
 Copy/Paste the save_timer folder to your maya20XX/scripts folder.
 Use the following lines in maya python console or shelf button:
 
-```from save_timer.save_timer import SaveTimer; SaveTimer()```
+```from save_timer.save_timer import SaveTimer; launch_save_timer()```
 
 To launch it on maya startup do the following:
 In the maya20XX/scripts folder, open or create the 'userSetup.py' file
@@ -50,9 +50,12 @@ SHELF_CALLBACK_NAMES = {
     'shelfTabChange'
 }
 
+save_timer = None
+
 
 class SaveTimer(QWidget):
     def __init__(self):
+
         self.shelf_timer_button = None
         self.top_shelf = None
         self.current_shelf = None
@@ -65,16 +68,16 @@ class SaveTimer(QWidget):
         self.create_button()
 
         # Register callbacks
-        om.MSceneMessage.addCallback(
+        self.save_callback_id = om.MSceneMessage.addCallback(
             om.MSceneMessage.kAfterSave, self.on_scene_save)
 
-        om.MSceneMessage.addCallback(
+        self.open_callback_id = om.MSceneMessage.addCallback(
             om.MSceneMessage.kAfterOpen, self.on_scene_open)
 
-        om.MSceneMessage.addCallback(
+        self.new_callback_id = om.MSceneMessage.addCallback(
             om.MSceneMessage.kAfterNew, self.on_scene_new)
 
-        om.MSceneMessage.addCallback(
+        self.exit_callback_id = om.MSceneMessage.addCallback(
             om.MSceneMessage.kMayaExiting, self.on_maya_exit)
 
         # This registers om callbacks mostly for user shelf interaction
@@ -191,11 +194,35 @@ class SaveTimer(QWidget):
         if proc_callback in SHELF_CALLBACK_NAMES:
             self.shelf_tab_changed()
 
-    def remove_callbacks(self):
-        om.MMessage.removeCallback(self.om_callbacks)
-
     def shelf_tab_changed(self):
         mc.evalDeferred(self.shelves_cleanup, lowestPriority=True)
         mc.evalDeferred(self.create_button, lowestPriority=True)
         self.update_button()
         return
+
+    def remove_callbacks(self):
+        # Remove callbacks using their IDs
+        om.MMessage.removeCallback(self.save_callback_id)
+        om.MMessage.removeCallback(self.open_callback_id)
+        om.MMessage.removeCallback(self.new_callback_id)
+        om.MMessage.removeCallback(self.exit_callback_id)
+        om.MMessage.removeCallback(self.om_callbacks)
+
+    def kill_save_timer(self):
+        self.remove_callbacks()
+        mc.evalDeferred(self.shelves_cleanup, lowestPriority=True)
+        if self.timer.isActive():
+            self.timer.stop()
+
+        self.shelf_timer_button = None
+        self.top_shelf = None
+        self.current_shelf = None
+
+
+def launch_save_timer():
+    global save_timer
+    if not save_timer:
+        save_timer = SaveTimer()
+        return
+    if save_timer:
+        save_timer.kill_save_timer()
