@@ -10,7 +10,7 @@ Copy/Paste the save_timer folder to your maya20XX/scripts folder.
 Use the following lines in maya python console or shelf button:
 
 ```
-from save_timer.save_timer import SaveTimer; launch_save_timer()
+from save_timer.save_timer import launch_save_timer; launch_save_timer()
 ```
 
 To launch it on maya startup do the following:
