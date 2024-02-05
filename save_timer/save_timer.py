@@ -104,38 +104,35 @@ class SaveTimer(QWidget):
         # print('New scene')
         if self.timer.isActive():
             self.timer.stop()
+        self.elapsed_timer.invalidate()
         self.update_button()
 
     def on_maya_exit(self, *args):
         self.shelves_cleanup()
 
     def get_current_state(self):
-        # print('check timer')
-        elapsed_time = float(self.elapsed_timer.elapsed() // 1000)
-        if elapsed_time < 0:
-            elapsed_time = -1.0
+        elapsed_time = -1.0
+        if self.timer.isActive():
+            elapsed_time = float(self.elapsed_timer.elapsed() // 1000)
         # Check elapsed time against thresholds
         for threshold, text_label, bg_color in TIMER_STATES:
             if elapsed_time <= threshold:
-                # self.update_button()
                 return text_label, bg_color
-        # Stop our timer because we reach end of states
+        # Stop our timer because we reached end of available states
         self.timer.stop()
 
     def update_button(self):
-        # print('Button updated')
         if not self.shelf_timer_button:
             return
-        text_label, bg_color = self.get_current_state()
+        label_text, bg_color = self.get_current_state()
         mc.shelfButton(
             self.shelf_timer_button,
             e=True,
-            label=text_label,
+            label=label_text,
             backgroundColor=bg_color
             )
 
     def create_button(self):
-        # print('Button Created')
         shelf_top_level = mm.eval('$temp = $gShelfTopLevel')
         current_shelf = mc.tabLayout(
             shelf_top_level, query=True, selectTab=True)
@@ -163,7 +160,6 @@ class SaveTimer(QWidget):
         return button_path
 
     def shelves_cleanup(self):
-
         if not self.current_shelf:
             self.top_shelf = mm.eval('$temp = $gShelfTopLevel;')
             self.current_shelf = mc.tabLayout(self.top_shelf, q=True, st=True)
@@ -197,7 +193,7 @@ class SaveTimer(QWidget):
     def shelf_tab_changed(self):
         mc.evalDeferred(self.shelves_cleanup, lowestPriority=True)
         mc.evalDeferred(self.create_button, lowestPriority=True)
-        self.update_button()
+        mc.evalDeferred(self.update_button, lowestPriority=True)
         return
 
     def remove_callbacks(self):
@@ -217,6 +213,9 @@ class SaveTimer(QWidget):
         self.shelf_timer_button = None
         self.top_shelf = None
         self.current_shelf = None
+
+        global save_timer
+        save_timer = None
 
 
 def launch_save_timer():
