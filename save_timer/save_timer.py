@@ -93,21 +93,18 @@ class SaveTimer(QWidget):
         print('Save Timer script has started')
 
     def on_scene_save(self, *args):
-        # print('scene saved')
         if not self.timer.isActive():
             self.timer.start(TIMER_INTERVAL)
         self.elapsed_timer.start()
         self.update_button()
 
     def on_scene_open(self, *args):
-        # print('scene opened')
         if not self.timer.isActive():
             self.timer.start(TIMER_INTERVAL)
         self.elapsed_timer.start()
         self.update_button()
 
     def on_scene_new(self, *args):
-        # print('New scene')
         if self.timer.isActive():
             self.timer.stop()
         self.elapsed_timer.invalidate()
@@ -181,7 +178,6 @@ class SaveTimer(QWidget):
             if any(button_label == label[1] for label in TIMER_STATES):
                 # last check if the shelf button exists before deleting it
                 if mc.shelfButton(button, exists=True):
-                    # print(f'Deleting button named : {button_label}')
                     mc.deleteUI(button)
 
         self.top_shelf = mm.eval('$temp = $gShelfTopLevel;')
@@ -203,7 +199,6 @@ class SaveTimer(QWidget):
         return
 
     def remove_callbacks(self):
-        # Remove callbacks using their IDs
         om.MMessage.removeCallback(self.save_callback_id)
         om.MMessage.removeCallback(self.open_callback_id)
         om.MMessage.removeCallback(self.new_callback_id)
@@ -213,8 +208,10 @@ class SaveTimer(QWidget):
     def kill_save_timer(self):
         self.remove_callbacks()
         mc.evalDeferred(self.shelves_cleanup, lowestPriority=True)
+
         if self.timer.isActive():
             self.timer.stop()
+        self.elapsed_timer.invalidate()
 
         self.shelf_timer_button = None
         self.top_shelf = None
@@ -222,6 +219,7 @@ class SaveTimer(QWidget):
 
         global save_timer
         save_timer = None
+        print('Save Timer script is now disabled')
 
 
 def launch_save_timer():
