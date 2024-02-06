@@ -81,7 +81,7 @@ class SaveTimer(QWidget):
             om.MSceneMessage.kAfterOpen, self.start_timer)
 
         self.new_callback_id = om.MSceneMessage.addCallback(
-            om.MSceneMessage.kAfterNew, self.on_scene_new)
+            om.MSceneMessage.kAfterNew, self.stop_timer)
 
         self.exit_callback_id = om.MSceneMessage.addCallback(
             om.MSceneMessage.kMayaExiting, self.on_maya_exit)
@@ -98,7 +98,7 @@ class SaveTimer(QWidget):
         self.elapsed_timer.start()
         self.update_button()
 
-    def on_scene_new(self, *args):
+    def stop_timer(self, *args):
         if self.timer.isActive():
             self.timer.stop()
         self.elapsed_timer.invalidate()
