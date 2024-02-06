@@ -75,10 +75,10 @@ class SaveTimer(QWidget):
 
         # Register callbacks
         self.save_callback_id = om.MSceneMessage.addCallback(
-            om.MSceneMessage.kAfterSave, self.on_scene_save)
+            om.MSceneMessage.kAfterSave, self.start_timer)
 
         self.open_callback_id = om.MSceneMessage.addCallback(
-            om.MSceneMessage.kAfterOpen, self.on_scene_open)
+            om.MSceneMessage.kAfterOpen, self.start_timer)
 
         self.new_callback_id = om.MSceneMessage.addCallback(
             om.MSceneMessage.kAfterNew, self.on_scene_new)
@@ -92,13 +92,7 @@ class SaveTimer(QWidget):
 
         print('Save Timer script has started')
 
-    def on_scene_save(self, *args):
-        if not self.timer.isActive():
-            self.timer.start(TIMER_INTERVAL)
-        self.elapsed_timer.start()
-        self.update_button()
-
-    def on_scene_open(self, *args):
+    def start_timer(self, *args):
         if not self.timer.isActive():
             self.timer.start(TIMER_INTERVAL)
         self.elapsed_timer.start()
