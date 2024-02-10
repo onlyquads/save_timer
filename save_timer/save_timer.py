@@ -6,15 +6,15 @@ to remind user to save file.
 # INSTALLATION:
 First Copy/Paste the save_timer folder to your maya20XX/scripts folder.
 
-Option 1: Use the following python code in maya python console or
-as shelf button:
+Option 1: Use the following python code in maya python console or as shelf
+button. It will act like a toggle ON/OFF button:
 
 from save_timer.save_timer import launch_save_timer; launch_save_timer()
 
 
-Option 2: Launch it automatically on maya startup:
-In the maya20XX/scripts folder, open or create the 'userSetup.py' file
-add these lines to it:
+Option 2 (best): Launch it automatically on maya startup:
+In the maya20XX/scripts folder, open or create the 'userSetup.py'
+file and add these lines to it:
 
 import maya.cmds as mc
 if not mc.about(batch=True):
