@@ -145,7 +145,7 @@ class SaveTimer(QWidget):
             backgroundColor=bg_color,
             preventOverride=True,
             command=SAVE_CMD)
-        mc.shelfButton(self.shelf_timer_button, edit=True, width=TIMER_BUTTON_WIDTH)
+
         mc.shelfLayout(current_shelf, e=True, pos=(self.shelf_timer_button, 1))
 
     def get_button_path(self):
