@@ -1,6 +1,6 @@
 # Save Timer
 ## Description:
-A maya script that creates a shelf button that changes over time to remind user to save file.
+A maya script that creates a shelf button that changes over time to remind user to save file. Whenever you change shelf tab, the button is deleted from the previous shelf and recreated on the current visible shelf.
 
 ![](https://garcia-nicolas.com/wp-content/uploads/2024/02/save_timer_demo.gif)
 
@@ -25,3 +25,4 @@ if not mc.about(batch=True):
 ```
 ## Compatibility:
 Maya 2022 and above
+

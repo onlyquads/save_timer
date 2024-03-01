@@ -1,7 +1,9 @@
 '''
 # DESCRIPTION:
-A maya script that creates a shelf button that changes over time
-to remind user to save file.
+A maya script that creates a shelf button that changes over time to remind
+user to save file. Whenever you change shelf tab, the button is deleted from
+the previous shelf and recreated on the current visible shelf.
+
 
 # INSTALLATION:
 First Copy/Paste the save_timer folder to your maya20XX/scripts folder.
