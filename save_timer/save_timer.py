@@ -98,13 +98,13 @@ class SaveTimer(QWidget):
         if not self.timer.isActive():
             self.timer.start(TIMER_INTERVAL)
         self.elapsed_timer.start()
-        self.update_button()
+        mc.evalDeferred(self.update_button, lowestPriority=True)
 
     def stop_timer(self, *args):
         if self.timer.isActive():
             self.timer.stop()
         self.elapsed_timer.invalidate()
-        self.update_button()
+        mc.evalDeferred(self.update_button, lowestPriority=True)
 
     def on_maya_exit(self, *args):
         self.shelves_cleanup()
