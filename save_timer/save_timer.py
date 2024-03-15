@@ -65,8 +65,6 @@ class SaveTimer(QWidget):
     def __init__(self):
 
         self.shelf_timer_button = None
-        self.top_shelf = None
-        self.current_shelf = None
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_button)
@@ -122,6 +120,7 @@ class SaveTimer(QWidget):
 
     def update_button(self):
         if not self.shelf_timer_button:
+            self.shelf_timer_button = self.get_button_path()
             return
         label_text, bg_color = self.get_current_state()
         mc.shelfButton(
@@ -147,26 +146,16 @@ class SaveTimer(QWidget):
             backgroundColor=bg_color,
             preventOverride=True,
             command=SAVE_CMD)
-
         mc.shelfLayout(current_shelf, e=True, pos=(self.shelf_timer_button, 1))
 
     def get_button_path(self):
-        shelf_top_level = mm.eval('$temp = $gShelfTopLevel')
-        current_shelf = mc.tabLayout(
-            shelf_top_level, query=True, selectTab=True)
-        button_path = (
-            f'{shelf_top_level}|{current_shelf}|{TOOLNAME}')
-        return button_path
+        top_shelf = mm.eval('$temp = $gShelfTopLevel;')
+        current_shelf = mc.tabLayout(top_shelf, q=True, st=True)
 
-    def shelves_cleanup(self):
-        if not self.current_shelf:
-            self.top_shelf = mm.eval('$temp = $gShelfTopLevel;')
-            self.current_shelf = mc.tabLayout(self.top_shelf, q=True, st=True)
-
-        buttons = mc.shelfLayout(self.current_shelf, q=True, ca=True)
+        buttons = mc.shelfLayout(current_shelf, q=True, ca=True)
 
         if not buttons:
-            return
+            return None
         for button in buttons:
             if mc.objectTypeUI(button) != 'shelfButton':
                 continue
@@ -174,10 +163,16 @@ class SaveTimer(QWidget):
             if any(button_label == label[1] for label in TIMER_STATES):
                 # last check if the shelf button exists before deleting it
                 if mc.shelfButton(button, exists=True):
-                    mc.deleteUI(button)
+                    return button
+        return None
 
-        self.top_shelf = mm.eval('$temp = $gShelfTopLevel;')
-        self.current_shelf = mc.tabLayout(self.top_shelf, q=True, st=True)
+    def shelves_cleanup(self):
+        button = self.get_button_path()
+        if button:
+            mc.deleteUI(button)
+
+        top_shelf = mm.eval('$temp = $gShelfTopLevel;')
+        mc.tabLayout(top_shelf, q=True, st=True)
 
     def cmd_after_callback(
             self, proc_callback, invocation_id, bool, value, user_data):
@@ -210,8 +205,6 @@ class SaveTimer(QWidget):
         self.elapsed_timer.invalidate()
 
         self.shelf_timer_button = None
-        self.top_shelf = None
-        self.current_shelf = None
 
         global save_timer
         save_timer = None
