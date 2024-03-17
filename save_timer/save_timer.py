@@ -170,7 +170,6 @@ class SaveTimer(QWidget):
         button = self.get_button_path()
         if button:
             mc.deleteUI(button)
-
         top_shelf = mm.eval('$temp = $gShelfTopLevel;')
         mc.tabLayout(top_shelf, q=True, st=True)
 
