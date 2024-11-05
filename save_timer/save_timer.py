@@ -109,6 +109,8 @@ class SaveTimer(QWidget):
 
     def get_current_state(self):
         elapsed_time = -1.0
+        if not self.timer.isActive():
+            return
         if self.timer.isActive():
             elapsed_time = float(self.elapsed_timer.elapsed() // 1000)
         # Check elapsed time against thresholds
@@ -121,6 +123,8 @@ class SaveTimer(QWidget):
     def update_button(self):
         if not self.shelf_timer_button:
             self.shelf_timer_button = self.get_button_path()
+            return
+        if not self.get_current_state():
             return
         label_text, bg_color = self.get_current_state()
         mc.shelfButton(
