@@ -24,7 +24,21 @@ if not mc.about(batch=True):
         "from save_timer.save_timer import SaveTimer; SaveTimer()",
         lowestPriority=True)
 
+Option 3 (with user options): Launch it automatically on maya startup with
+message box to ask if user want's it or not and set optionVar automatically:
 
+import maya.cmds as mc
+if not mc.about(batch=True):
+    mc.evalDeferred(
+        "from save_timer.save_timer import auto_start_save_timer; auto_start_save_timer()",
+        lowestPriority=True)
+
+        
+If you want the user to be able to get the message box back to change option:
+
+from save_timer.save_timer import show_save_timer_startup_message;
+show_save_timer_startup_message()
+        
 # COMPATIBILITY:
 Maya 2022 and above
 
@@ -33,12 +47,13 @@ Maya 2022 and above
 import maya.cmds as mc
 import maya.mel as mm
 import maya.OpenMaya as om
-from PySide2.QtWidgets import QWidget
+from PySide2.QtWidgets import QWidget, QMessageBox
 from PySide2.QtCore import QTimer, QElapsedTimer
 
 TOOLNAME = 'Save Timer'
 TIMER_INTERVAL = 90000  # In milliseconds (1min30)
 TIMER_BUTTON_WIDTH = 120
+SAVE_TIMER_AUTOLAUNCH_OPTVAR = 'saveTimerAutoLaunch'
 
 TIMER_STATES = [
     (-1.0, 'FILE NOT SAVED', (1.0, 0.0, 0.0)),
@@ -109,8 +124,6 @@ class SaveTimer(QWidget):
 
     def get_current_state(self):
         elapsed_time = -1.0
-        if not self.timer.isActive():
-            return
         if self.timer.isActive():
             elapsed_time = float(self.elapsed_timer.elapsed() // 1000)
         # Check elapsed time against thresholds
@@ -220,3 +233,45 @@ def launch_save_timer():
         save_timer = SaveTimer()
         return
     save_timer.kill_save_timer()
+
+
+def show_save_timer_startup_message():
+    error_dialog = QMessageBox()
+    error_dialog.setText(
+        '<p>Do you want to use the Save Timer button?</p>'
+        '<p>Save Timer is a shelf button that changes over time '
+        'to remind you to save your file</p>'
+        )
+    error_dialog.setIcon(QMessageBox.Warning)
+    error_dialog.setWindowTitle("Warning")
+    error_dialog.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+
+    response = error_dialog.exec_()
+    if response == QMessageBox.Yes:
+        create_autostart_pref(value=True)
+    else:
+        create_autostart_pref(value=False)
+
+
+def create_autostart_pref(value=True):
+    mc.optionVar(iv=(SAVE_TIMER_AUTOLAUNCH_OPTVAR, int(value)))
+    if not value:
+        global save_timer
+        if save_timer:
+            save_timer.kill_save_timer()
+            return
+    auto_start_save_timer()
+
+
+def auto_start_save_timer():
+    if not mc.optionVar(exists=SAVE_TIMER_AUTOLAUNCH_OPTVAR):
+        show_save_timer_startup_message()
+        return
+
+    if mc.optionVar(exists=SAVE_TIMER_AUTOLAUNCH_OPTVAR):
+        save_timer_start_on_launch = mc.optionVar(
+            q=SAVE_TIMER_AUTOLAUNCH_OPTVAR)
+
+        if save_timer_start_on_launch:
+            launch_save_timer()
+            return
