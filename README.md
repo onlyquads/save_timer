@@ -23,6 +23,24 @@ if not mc.about(batch=True):
         "from save_timer.save_timer import SaveTimer; SaveTimer()",
         lowestPriority=True)
 ```
+
+
+Option 3 (with user options): Launch it automatically on maya startup with
+message box to ask if user want's it or not and set this preference
+automatically for next maya sessions:
+```python
+import maya.cmds as mc
+if not mc.about(batch=True):
+    mc.evalDeferred(
+        "from save_timer.save_timer import auto_start_save_timer; auto_start_save_timer()",
+        lowestPriority=True)
+```
+
+If you want the user to be able to get the message box back to change option:
+```python
+from save_timer.save_timer import show_save_timer_startup_message;
+show_save_timer_startup_message()
+```
 ## Compatibility:
 Maya 2022 and above
 

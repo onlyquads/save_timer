@@ -33,12 +33,12 @@ if not mc.about(batch=True):
         "from save_timer.save_timer import auto_start_save_timer; auto_start_save_timer()",
         lowestPriority=True)
 
-        
+
 If you want the user to be able to get the message box back to change option:
 
 from save_timer.save_timer import show_save_timer_startup_message;
 show_save_timer_startup_message()
-        
+
 # COMPATIBILITY:
 Maya 2022 and above
 
