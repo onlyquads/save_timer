@@ -30,10 +30,10 @@ message box to ask if user want's it or not and set optionVar automatically:
 import maya.cmds as mc
 if not mc.about(batch=True):
     mc.evalDeferred(
-        "from save_timer.save_timer import auto_start_save_timer; auto_start_save_timer()",
-        lowestPriority=True)
-
-
+        "from save_timer.save_timer import auto_start_save_timer; "
+        "auto_start_save_timer()",
+        lowestPriority=True
+    )
 If you want the user to be able to get the message box back to change option:
 
 from save_timer.save_timer import show_save_timer_startup_message;
@@ -54,6 +54,7 @@ TOOLNAME = 'Save Timer'
 TIMER_INTERVAL = 90000  # In milliseconds (1min30)
 TIMER_BUTTON_WIDTH = 120
 SAVE_TIMER_AUTOLAUNCH_OPTVAR = 'saveTimerAutoLaunch'
+SAVE_TIMER_SEPARATOR = 'save_timer_separator'
 
 TIMER_STATES = [
     (-1.0, 'FILE NOT SAVED', (1.0, 0.0, 0.0)),
@@ -80,6 +81,7 @@ class SaveTimer(QWidget):
     def __init__(self):
 
         self.shelf_timer_button = None
+        self.shelf_separator = None
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_button)
@@ -87,6 +89,7 @@ class SaveTimer(QWidget):
 
         self.shelves_cleanup()
         self.create_button()
+        self.create_separator()
 
         # Register callbacks
         self.save_callback_id = om.MSceneMessage.addCallback(
@@ -122,6 +125,12 @@ class SaveTimer(QWidget):
     def on_maya_exit(self, *args):
         self.shelves_cleanup()
 
+    def get_top_level_shelf(self):
+        shelf_top_level = mm.eval('$temp = $gShelfTopLevel')
+        current_shelf = mc.tabLayout(
+            shelf_top_level, query=True, selectTab=True)
+        return current_shelf
+
     def get_current_state(self):
         elapsed_time = -1.0
         if self.timer.isActive():
@@ -148,9 +157,7 @@ class SaveTimer(QWidget):
             )
 
     def create_button(self):
-        shelf_top_level = mm.eval('$temp = $gShelfTopLevel')
-        current_shelf = mc.tabLayout(
-            shelf_top_level, query=True, selectTab=True)
+        current_shelf = self.get_top_level_shelf()
         mc.setParent(current_shelf)
         label_text, bg_color = self.get_current_state()
         self.shelf_timer_button = mc.shelfButton(
@@ -165,12 +172,22 @@ class SaveTimer(QWidget):
             command=SAVE_CMD)
         mc.shelfLayout(current_shelf, e=True, pos=(self.shelf_timer_button, 1))
 
+    def create_separator(self):
+        current_shelf = self.get_top_level_shelf()
+        mc.setParent(current_shelf)
+        self.shelf_separator = mc.separator(
+            width=12,
+            height=35,
+            style="shelf",
+            hr=False,
+            ann=SAVE_TIMER_SEPARATOR)
+
+        mc.shelfLayout(current_shelf, e=True, pos=(self.shelf_separator, 2))
+
     def get_button_path(self):
-        top_shelf = mm.eval('$temp = $gShelfTopLevel;')
-        current_shelf = mc.tabLayout(top_shelf, q=True, st=True)
+        current_shelf = self.get_top_level_shelf()
 
         buttons = mc.shelfLayout(current_shelf, q=True, ca=True)
-
         if not buttons:
             return None
         for button in buttons:
@@ -183,12 +200,25 @@ class SaveTimer(QWidget):
                     return button
         return None
 
+    def get_save_timer_separator_path(self):
+        current_shelf = self.get_top_level_shelf()
+        buttons = mc.shelfLayout(current_shelf, q=True, ca=True)
+        if not buttons:
+            return None
+        for child in buttons:
+            if mc.control(child, exists=True):
+                ann = mc.control(child, query=True, annotation=True)
+                if ann == SAVE_TIMER_SEPARATOR:
+                    return child
+        return None
+
     def shelves_cleanup(self):
-        button = self.get_button_path()
-        if button:
-            mc.deleteUI(button)
-        top_shelf = mm.eval('$temp = $gShelfTopLevel;')
-        mc.tabLayout(top_shelf, q=True, st=True)
+        button_path = self.get_button_path()
+        separator_path = self.get_save_timer_separator_path()
+
+        for ui_element in (button_path, separator_path):
+            if ui_element and mc.control(ui_element, exists=True):
+                mc.deleteUI(ui_element)
 
     def cmd_after_callback(
             self, proc_callback, invocation_id, bool, value, user_data):
@@ -202,6 +232,7 @@ class SaveTimer(QWidget):
     def shelf_tab_changed(self):
         mc.evalDeferred(self.shelves_cleanup, lowestPriority=True)
         mc.evalDeferred(self.create_button, lowestPriority=True)
+        mc.evalDeferred(self.create_separator, lowestPriority=True)
         mc.evalDeferred(self.update_button, lowestPriority=True)
         return
 
@@ -241,16 +272,13 @@ def show_save_timer_startup_message():
         '<p>Do you want to use the Save Timer button?</p>'
         '<p>Save Timer is a shelf button that changes over time '
         'to remind you to save your file</p>'
-        )
+    )
     error_dialog.setIcon(QMessageBox.Warning)
     error_dialog.setWindowTitle("Warning")
     error_dialog.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
 
     response = error_dialog.exec_()
-    if response == QMessageBox.Yes:
-        create_autostart_pref(value=True)
-    else:
-        create_autostart_pref(value=False)
+    create_autostart_pref(value=(response == QMessageBox.Yes))
 
 
 def create_autostart_pref(value=True):
@@ -275,3 +303,8 @@ def auto_start_save_timer():
         if save_timer_start_on_launch:
             launch_save_timer()
             return
+
+
+if __name__ == '__main__':
+
+    launch_save_timer()
