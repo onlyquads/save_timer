@@ -11,7 +11,8 @@ First Copy/Paste the save_timer folder to your maya20XX/scripts folder.
 Option 1: Use the following python code in maya python console or as shelf
 button. It will act like a toggle ON/OFF button:
 
-from save_timer.save_timer import launch_save_timer; launch_save_timer()
+from save_timer.save_timer import launch_save_timer;
+launch_save_timer(add_separator=True)
 
 
 Option 2 (best): Launch it automatically on maya startup:
@@ -21,7 +22,8 @@ file and add these lines to it:
 import maya.cmds as mc
 if not mc.about(batch=True):
     mc.evalDeferred(
-        "from save_timer.save_timer import SaveTimer; SaveTimer()",
+        "from save_timer.save_timer import SaveTimer; "
+        "SaveTimer(add_separator=True)",
         lowestPriority=True)
 
 Option 3 (with user options): Launch it automatically on maya startup with
@@ -31,7 +33,7 @@ import maya.cmds as mc
 if not mc.about(batch=True):
     mc.evalDeferred(
         "from save_timer.save_timer import auto_start_save_timer; "
-        "auto_start_save_timer()",
+        "auto_start_save_timer(add_separator=True)",
         lowestPriority=True
     )
 If you want the user to be able to get the message box back to change option:
@@ -78,7 +80,7 @@ save_timer = None
 
 
 class SaveTimer(QWidget):
-    def __init__(self):
+    def __init__(self, add_separator=True):
 
         self.shelf_timer_button = None
         self.shelf_separator = None
@@ -89,7 +91,9 @@ class SaveTimer(QWidget):
 
         self.shelves_cleanup()
         self.create_button()
-        self.create_separator()
+        self.add_separator = add_separator
+        if self.add_separator:
+            self.create_separator()
 
         # Register callbacks
         self.save_callback_id = om.MSceneMessage.addCallback(
@@ -232,7 +236,8 @@ class SaveTimer(QWidget):
     def shelf_tab_changed(self):
         mc.evalDeferred(self.shelves_cleanup, lowestPriority=True)
         mc.evalDeferred(self.create_button, lowestPriority=True)
-        mc.evalDeferred(self.create_separator, lowestPriority=True)
+        if self.add_separator:
+            mc.evalDeferred(self.create_separator, lowestPriority=True)
         mc.evalDeferred(self.update_button, lowestPriority=True)
         return
 
@@ -258,10 +263,10 @@ class SaveTimer(QWidget):
         print('Save Timer script is now disabled')
 
 
-def launch_save_timer():
+def launch_save_timer(add_separator=True):
     global save_timer
     if not save_timer:
-        save_timer = SaveTimer()
+        save_timer = SaveTimer(add_separator=add_separator)
         return
     save_timer.kill_save_timer()
 
@@ -291,7 +296,7 @@ def create_autostart_pref(value=True):
     auto_start_save_timer()
 
 
-def auto_start_save_timer():
+def auto_start_save_timer(add_separator=True):
     if not mc.optionVar(exists=SAVE_TIMER_AUTOLAUNCH_OPTVAR):
         show_save_timer_startup_message()
         return
@@ -301,10 +306,10 @@ def auto_start_save_timer():
             q=SAVE_TIMER_AUTOLAUNCH_OPTVAR)
 
         if save_timer_start_on_launch:
-            launch_save_timer()
+            launch_save_timer(add_separator=add_separator)
             return
 
 
 if __name__ == '__main__':
 
-    launch_save_timer()
+    launch_save_timer(add_separator=True)
