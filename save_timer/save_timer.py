@@ -157,7 +157,11 @@ class SaveTimer(QWidget):
             self.shelf_timer_button,
             e=True,
             label=label_text,
-            backgroundColor=bg_color
+            style='textOnly',
+            font='plainLabelFont',
+            align='center',
+            backgroundColor=bg_color,
+            width=TIMER_BUTTON_WIDTH,
             )
 
     def create_button(self):
